@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>매일 여는 30초 만두 가게</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+            background-color: #FFFAF0;
+        }
+        .fever-mode {
+            animation: feverPulse 0.4s infinite alternate ease-in-out;
+        }
+        @keyframes feverPulse {
+            from { background-color: #fffbeb; }
+            to { background-color: #fef3c7; }
+        }
+        .fever-break {
+            animation: breakShake 0.3s ease-in-out;
+        }
+        @keyframes breakShake {
+            0%, 100% { transform: translateX(0); background-color: #fef3c7; }
+            20%, 60% { transform: translateX(-8px); background-color: #fca5a5; }
+            40%, 80% { transform: translateX(8px); background-color: #fca5a5; }
+        }
+
+        .succ-elastic {
+            animation: jellyBounce 0.5s cubic-bezier(0.25, 1.5, 0.5, 1);
+        }
+        @keyframes jellyBounce {
+            0% { transform: scale(1, 1) translateY(0); }
+            30% { transform: scale(1.25, 0.75) translateY(0); }
+            40% { transform: scale(0.75, 1.25) translateY(-20px); }
+            55% { transform: scale(1.15, 0.85) translateY(-5px); }
+            70% { transform: scale(0.95, 1.05) translateY(0); }
+            100% { transform: scale(1, 1) translateY(0); }
+        }
+
+        .fail-drop {
+            animation: heavyDropShake 0.45s ease-in-out;
+        }
+        @keyframes heavyDropShake {
+            0% { transform: translateY(-10px) rotate(0deg); }
+            20% { transform: translateY(5px) rotate(-8deg); }
+            40% { transform: translateY(0) rotate(8deg); }
+            60% { transform: translateY(0) rotate(-4deg); }
+            80% { transform: translateY(0) rotate(4deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center h-screen w-screen">
+
+    <div id="game-container" class="relative w-full max-w-[450px] h-full sm:h-[92vh] sm:rounded-[40px] bg-[#FFFAF0] flex flex-col justify-between shadow-[0_24px_60px_rgba(180,150,100,0.1)] overflow-hidden transition-all duration-300">
+        
+        <div id="damage-flash" class="absolute inset-0 bg-red-500/20 z-40 pointer-events-none opacity-0 transition-opacity duration-100"></div>
+
+        <div id="start-screen" class="absolute inset-0 z-50 flex flex-col justify-between p-8 text-center bg-[#FFFAF0]">
+            <div class="mt-16 space-y-8 flex flex-col items-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl text-5xl shadow-sm animate-bounce duration-1000 border-2 border-amber-100">🥟</div>
+                <div class="space-y-3 w-full">
+                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight leading-tight">
+                        매일 열리는<br><span class="text-amber-600">30초 만두 가게</span>
+                    </h1>
+                    <p class="text-base text-slate-500 font-medium leading-relaxed">
+                        하루에 딱 한 번만 참여할 수 있어요.<br>빠르게 서빙하고 포인트를 적립해 보세요.
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-5 space-y-3.5 border border-amber-100 text-left w-full shadow-sm">
+                    <p class="text-sm font-bold text-amber-900">💡 미션 규칙 안내</p>
+                    <p class="text-xs text-slate-600">1. 손님이 주문한 메뉴를 순서대로 눌러주세요.</p>
+                    <p class="text-xs text-slate-600">2. 5회 연속 성공 시 <span class="text-orange-500 font-bold">피버 타임(점수 3배)</span> 시작!</p>
+                    <p class="text-xs text-slate-600">3. 오답을 누르면 제한 시간이 3초 줄어들어요.</p>
+                    <p class="text-xs text-slate-600">4. <span class="text-red-500 font-bold">단 한 번이라도 틀리면 피버타임 즉시 종료!</span></p>
+                </div>
+            </div>
+            
+            <button onclick="startGame()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-4.5 rounded-2xl text-lg transition-all duration-150 active:scale-[0.98] tracking-tight shadow-md">
+                오늘의 영업 시작하기
+            </button>
+        </div>
+
+        <div id="already-played-screen" class="hidden absolute inset-0 z-50 flex flex-col justify-between p-6 text-center bg-[#FFFAF0]">
+            <div class="mt-10 space-y-6 flex flex-col items-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl text-5xl shadow-sm border-2 border-amber-100">🌙</div>
+                <div class="space-y-3 w-full">
+                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight leading-tight">
+                        오늘 영업은<br><span class="text-amber-600">이미 마감했어요</span>
+                    </h1>
+                    <p class="text-base text-slate-500 font-medium leading-relaxed">
+                        하루에 한 번만 참여할 수 있어요.<br>내일 다시 가게 문을 열어주세요!
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 space-y-3 border border-amber-100 text-left w-full shadow-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-500">오늘 매출</span>
+                        <span id="already-played-score" class="font-bold text-slate-900">0 Q</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-amber-50 pt-3">
+                        <span class="text-sm text-slate-500">오늘 획득 포인트</span>
+                        <span id="already-played-cash" class="font-bold text-emerald-600">0 원</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-amber-50 pt-3">
+                        <span class="text-sm text-slate-500">누적 포인트</span>
+                        <span id="already-played-total" class="font-bold text-amber-600">0 원</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3 mt-6 pb-2">
+                <button onclick="shareResultMobile()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-4 rounded-2xl text-base transition-all duration-150 active:scale-[0.98] tracking-tight shadow-md">
+                    오늘 기록 자랑하기 🚀
+                </button>
+                <button onclick="closeApp()" class="w-full bg-white hover:bg-slate-200 text-slate-700 font-semibold py-4 rounded-2xl text-base transition border border-slate-200">
+                    내일 다시 만나요 👋
+                </button>
+            </div>
+        </div>
+
+        <div class="px-6 pt-6 pb-4 bg-[#FFFAF0] space-y-4">
+            <div class="flex justify-between items-center">
+                <span id="streak-badge" class="text-[12px] font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">연속 출석 1일차 🔥</span>
+                <div class="text-right">
+                    <p class="text-xs text-slate-400 font-medium">현재 스코어</p>
+                    <p id="score-display" class="text-2xl font-bold text-slate-900 tracking-tight">0 Q</p>
+                </div>
+            </div>
+            
+            <div class="w-full bg-amber-100 h-1.5 rounded-full overflow-hidden">
+                <div id="timer-bar" class="bg-slate-900 h-full w-full transition-all duration-100 linear"></div>
+            </div>
+        </div>
+
+        <div id="stage-area" class="flex-1 flex flex-col justify-center items-center p-6 bg-[#FFFAF0] relative transition-colors duration-300">
+            <div id="combo-display" class="absolute top-8 font-extrabold text-sm text-amber-800 bg-amber-200 border border-amber-300 px-4 py-1.5 rounded-full shadow-md opacity-0 scale-75 transition-all duration-200 z-10">
+                0 연속 서빙 성공!
+            </div>
+
+            <div class="flex flex-col items-center space-y-6 w-full">
+                <div id="order-bubble" class="bg-white rounded-2xl py-4 px-8 shadow-[0_12px_24px_rgba(180,150,100,0.05)] text-center transition-all duration-200 border border-amber-100 min-w-[160px]">
+                    <div id="order-items" class="flex justify-center space-x-2 text-3xl"></div>
+                </div>
+                
+                <div class="text-center space-y-2">
+                    <div id="customer-avatar" class="text-7xl min-h-[84px] filter drop-shadow-sm select-none">🏃‍♂️</div>
+                    <span id="customer-name" class="inline-block text-[12px] font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">급한 직장인</span>
+                </div>
+            </div>
+
+            <div id="fever-notice" class="hidden absolute inset-0 flex items-center justify-center bg-amber-500/5 pointer-events-none">
+                <div class="bg-amber-500 text-white font-bold text-xs px-4 py-2 rounded-full shadow-md animate-pulse">
+                    🔥 피버 찬스: 점수 3배 적립 중!
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 bg-[#FFFAF0] space-y-4 shadow-[0_-10px_30px_rgba(180,150,100,0.05)]">
+            <div class="grid grid-cols-4 gap-3">
+                <button onclick="pressMenu('🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                    <span class="text-3xl">🥟</span>
+                    <span class="text-xs font-semibold mt-2 text-slate-700">고기</span>
+                </button>
+                <button onclick="pressMenu('🔥🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                    <span class="text-3xl">🌶️</span>
+                    <span class="text-xs font-semibold mt-2 text-slate-700">김치</span>
+                </button>
+                <button onclick="pressMenu('🥤')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                    <span class="text-3xl">🥤</span>
+                    <span class="text-xs font-semibold mt-2 text-slate-700">식혜</span>
+                </button>
+                <button onclick="pressMenu('🍵')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                    <span class="text-3xl">🍵</span>
+                    <span class="text-xs font-semibold mt-2 text-slate-700">수정과</span>
+                </button>
+            </div>
+        </div>
+
+<div id="end-screen" class="hidden absolute inset-0 bg-[#FFFAF0] z-50 flex flex-col p-6 overflow-y-auto">
+    <div class="mb-6">
+        <span id="final-badge" class="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded-md">오늘 보상 정산</span>
+        <h2 class="text-xl font-bold text-slate-900 mt-2">오늘 장사 정말 고생하셨어요!</h2>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm space-y-4 mb-6">
+        <div class="flex justify-between items-center">
+            <span class="text-slate-500 text-sm">오늘 매출액</span>
+            <span id="final-coin" class="font-bold text-slate-900">0 Q</span>
+        </div>
+        <div class="flex justify-between items-center border-t border-amber-50 pt-3">
+            <span class="text-slate-500 text-sm">전환 가능 포인트</span>
+            <span id="final-cash" class="font-bold text-emerald-600">0 원</span>
+        </div>
+        <div class="flex justify-between items-center border-t border-amber-50 pt-3">
+            <span class="text-slate-500 text-sm">누적 포인트</span>
+            <span id="total-accumulated-cash" class="font-bold text-amber-600">0 원</span>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm mb-6">
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-sm font-bold text-slate-700">나의 가게 레벨</span>
+            <span id="level-percentage-text" class="text-sm font-bold text-amber-600">Lv.1</span>
+        </div>
+        <div class="w-full bg-amber-100 h-2.5 rounded-full overflow-hidden">
+            <div id="level-bar" class="bg-amber-500 h-full w-[20%] transition-all duration-500 rounded-full"></div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-amber-50">
+            <p id="grade-title" class="font-bold text-slate-900 text-sm mb-1"></p>
+            <p id="grade-comment" class="text-xs text-slate-500 leading-relaxed font-medium"></p>
+        </div>
+    </div>
+
+    <div class="space-y-3 mt-auto">
+        <button onclick="shareResultMobile()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-4.5 rounded-2xl text-sm transition active:scale-[0.98] shadow-md">
+            내 기록 친구한테 자랑하기 🚀
+        </button>
+        <button onclick="closeApp()" class="w-full bg-white hover:bg-slate-200 text-slate-700 font-bold py-4.5 rounded-2xl text-sm transition border border-slate-200">
+            닫기
+        </button>
+    </div>
+</div>
+
+    <script>
+        let score = 0;
+        let timeLeft = 30; 
+        const TOTAL_TIME = 30; 
+        let gameInterval = null;
+        let combo = 0;
+        let isFever = false;
+        let feverTimeout = null;
+
+        const STORAGE_LAST_PLAY = 'mandu_last_play_date';
+        const STORAGE_TOTAL_CASH = 'mandu_total_cash';
+        const STORAGE_STREAK = 'mandu_streak';
+        const STORAGE_LAST_SCORE = 'mandu_last_score';
+        const STORAGE_LAST_CASH = 'mandu_last_cash';
+
+        function todayStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        function yesterdayStr() {
+            const d = new Date();
+            d.setDate(d.getDate() - 1);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        function getTotalCash() {
+            return parseInt(localStorage.getItem(STORAGE_TOTAL_CASH) || '0', 10);
+        }
+
+        function getStreak() {
+            return parseInt(localStorage.getItem(STORAGE_STREAK) || '0', 10);
+        }
+
+        // 페이지 로드시: 오늘 이미 플레이했는지 확인하고, 연속 출석일 계산
+        function initGate() {
+            const lastPlay = localStorage.getItem(STORAGE_LAST_PLAY);
+            const today = todayStr();
+
+            // 출석 표시용 streak 계산 (오늘 플레이 전 기준 안내)
+            let streak = getStreak();
+            if (lastPlay === today) {
+                // 오늘 이미 플레이함 -> 마감 화면
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('already-played-screen').classList.remove('hidden');
+                const lastScore = parseInt(localStorage.getItem(STORAGE_LAST_SCORE) || '0', 10);
+                const lastCash = parseInt(localStorage.getItem(STORAGE_LAST_CASH) || '0', 10);
+                document.getElementById('already-played-score').innerText = `${lastScore.toLocaleString()} Q`;
+                document.getElementById('already-played-cash').innerText = `${lastCash.toLocaleString()} 원`;
+                document.getElementById('already-played-total').innerText = `${getTotalCash().toLocaleString()} 원`;
+            } else {
+                // 아직 오늘 플레이 안함 -> 출석 배지에 "오늘 플레이하면 될 streak" 미리 보여주기
+                let previewStreak;
+                if (lastPlay === yesterdayStr()) {
+                    previewStreak = streak + 1;
+                } else if (lastPlay === today) {
+                    previewStreak = streak;
+                } else {
+                    previewStreak = 1;
+                }
+                document.getElementById('streak-badge').innerText = `연속 출석 ${previewStreak}일차 🔥`;
+            }
+        }
+
+        // 실제 플레이 기록(날짜/연속일수)을 확정 저장 - 게임 시작 시점에 호출
+        function commitAttendance() {
+            const lastPlay = localStorage.getItem(STORAGE_LAST_PLAY);
+            const today = todayStr();
+            let streak = getStreak();
+
+            if (lastPlay === yesterdayStr()) {
+                streak = streak + 1;
+            } else if (lastPlay !== today) {
+                streak = 1;
+            }
+            localStorage.setItem(STORAGE_STREAK, String(streak));
+            localStorage.setItem(STORAGE_LAST_PLAY, today);
+            document.getElementById('streak-badge').innerText = `연속 출석 ${streak}일차 🔥`;
+        }
+
+        function getGradeInfo(s) {
+            if (s >= 3500) {
+                return {
+                    badgeText: "🥇 미슐랭 3스타 달성",
+                    titleText: "Lv.5 전설의 만두 장인",
+                    commentText: "주방에서 불꽃이 튀는 줄 알았습니다! 손님들이 만두 맛에 감동해서 가게 문 닫을 때까지 안 가고 버티네요. 오늘은 만두 완판입니다!",
+                    levelPercent: "100%",
+                    levelText: "Lv.5 (최고 레벨)"
+                };
+            } else if (s >= 2200) {
+                return {
+                    badgeText: "🥈 베테랑 점장",
+                    titleText: "Lv.4 울동네 1등 주방장",
+                    commentText: "이 구역의 서빙 마스터! 밀려드는 주문을 눈 감고도 쳐내시네요. 단골손님들이 벌써 내일 오픈런 하겠다고 줄 서기 시작했습니다!",
+                    levelPercent: "75%",
+                    levelText: "Lv.4"
+                };
+            } else if (s >= 1000) {
+                return {
+                    badgeText: "🥉 수습 주방장",
+                    titleText: "Lv.3 듬직한 신입 이모",
+                    commentText: "제법 손발이 척척 맞는데요? 손님들이 아주 만족스럽게 식혜까지 들이키고 가셨습니다. 내일은 '피버'를 조금 더 터뜨려 볼까요?",
+                    levelPercent: "50%",
+                    levelText: "Lv.3"
+                };
+            } else if (s >= 300) {
+                return {
+                    badgeText: "⚠️ 만두 초보",
+                    titleText: "Lv.2 주방 불조절 초보",
+                    commentText: "아이고, 만두가 살짝 탔네요! 그래도 손님들이 착해서 그냥 드시고 가셨어요. 다음엔 주문 순서 헷갈리지 않게 정신 바짝 차려주세요!",
+                    levelPercent: "30%",
+                    levelText: "Lv.2"
+                };
+            } else {
+                return {
+                    badgeText: "🚨 서비스 긴급 점검",
+                    titleText: "Lv.1 만두피 빚기 담당",
+                    commentText: "오늘 주방 상황이 영 좋지 않네요... 손님들이 화나서 다 나가버렸어요! 다시 앞치마 꽉 매고 만두 빚기 연습부터 시작하시죠!",
+                    levelPercent: "10%",
+                    levelText: "Lv.1"
+                };
+            }
+        }
+
+        function closeApp() {
+            window.close();
+            // window.close()가 차단된 환경(대부분의 일반 브라우저 탭)을 대비한 안내
+            setTimeout(() => {
+                alert("이 창을 닫아주세요. 내일 다시 만나요! 🥟");
+            }, 200);
+        }
+
+
+        const customers = [
+            { name: "급한 직장인", avatar: "🏃‍♂️" },
+            { name: "동네 할머니", avatar: "👵" },
+            { name: "단골 길냥이", avatar: "🐱" },
+            { name: "급식 고등학생", avatar: "👦" },
+            { name: "혼밥 대학생", avatar: "🧑" },
+            { name: "만취 취객", avatar: "🥴" },
+            { name: "먹방 유튜버", avatar: "🐷" },
+            { name: "깐깐한 미식가", avatar: "🧐" }
+        ];
+
+        const wrongReactions = ["😭", "😰", "💫", "🤧", "🙄", "🤨"];
+        const menuPool = ["🥟", "🔥🥟", "🥤", "🍵"];
+        
+        let currentOrder = [];
+        let currentProgress = 0;
+        let currentCustomerBackup = null;
+
+function startGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    commitAttendance();
+    score = 0;
+    timeLeft = TOTAL_TIME; // 30초
+    nextCustomer();
+    // 100ms(0.1초) 주기로 부드럽게 감소
+    gameInterval = setInterval(() => {
+        timeLeft -= 0.1; 
+        const timerBar = document.getElementById('timer-bar');
+        const percentage = (timeLeft / TOTAL_TIME) * 100;
+        
+        // 너비 적용
+        timerBar.style.width = Math.max(0, percentage) + '%';
+
+        // 30% 이하일 때 색상 변경
+        if (percentage < 30) {
+            timerBar.classList.add('bg-red-500');
+            timerBar.classList.remove('bg-slate-900');
+        } else {
+            timerBar.classList.remove('bg-red-500');
+            timerBar.classList.add('bg-slate-900');
+        }
+
+        // 종료 처리
+        if (timeLeft <= 0) {
+            clearInterval(gameInterval);
+            endGame();
+        }
+    }, 100);
+}
+
+        function nextCustomer() {
+            const randomCustomer = customers[Math.floor(Math.random() * customers.length)];
+            currentCustomerBackup = randomCustomer;
+            
+            const avatarDiv = document.getElementById('customer-avatar');
+            avatarDiv.innerText = randomCustomer.avatar;
+            avatarDiv.className = "text-7xl min-h-[84px] filter drop-shadow-sm select-none"; 
+            
+            document.getElementById('customer-name').innerText = randomCustomer.name;
+
+            const orderSize = isFever ? 1 : Math.floor(Math.random() * 3) + 1;
+            currentOrder = [];
+            for(let i=0; i<orderSize; i++) {
+                currentOrder.push(menuPool[Math.floor(Math.random() * menuPool.length)]);
+            }
+            currentProgress = 0;
+            renderOrder();
+        }
+
+        function renderOrder() {
+            const container = document.getElementById('order-items');
+            container.innerHTML = '';
+            currentOrder.forEach((item, index) => {
+                const span = document.createElement('span');
+                span.innerText = item === '🔥🥟' ? '🌶️' : item;
+                if (index < currentProgress) {
+                    span.classList.add('opacity-10', 'scale-75', 'line-through');
+                }
+                container.appendChild(span);
+            });
+        }
+
+        function pressMenu(menu) {
+            if (timeLeft <= 0) return;
+            if (navigator.vibrate) navigator.vibrate(20);
+
+            if (isFever) {
+                if (currentOrder[currentProgress] === menu) {
+                    handleCorrect();
+                } else {
+                    stopFeverWithAnimation();
+                }
+                return;
+            }
+
+            if (currentOrder[currentProgress] === menu) {
+                currentProgress++;
+                if (currentProgress >= currentOrder.length) {
+                    handleCorrect();
+                } else {
+                    renderOrder();
+                }
+            } else {
+                handleWrong();
+            }
+        }
+
+        function handleCorrect() {
+            combo++;
+            const coinGain = isFever ? 300 : 100;
+            score += coinGain;
+
+            const avatarDiv = document.getElementById('customer-avatar');
+            avatarDiv.classList.remove('succ-elastic', 'fail-drop');
+            void avatarDiv.offsetWidth; 
+            avatarDiv.classList.add('succ-elastic');
+
+            const comboText = document.getElementById('combo-display');
+            comboText.innerText = isFever ? `🔥 대성공 +${coinGain}Q!` : `✨ ${combo}연속 서빙 성공!`;
+            comboText.classList.remove('opacity-0', 'scale-75');
+            comboText.classList.add('opacity-100', 'scale-105');
+            setTimeout(() => {
+                comboText.classList.add('opacity-0', 'scale-75');
+                comboText.classList.remove('opacity-100', 'scale-105');
+            }, 400);
+
+            if (combo > 0 && combo % 5 === 0 && !isFever) {
+                triggerFever();
+            }
+
+            updateUI();
+            nextCustomer();
+        }
+
+        function handleWrong() {
+            combo = 0; 
+            timeLeft = Math.max(0, timeLeft - 3); 
+            if (navigator.vibrate) navigator.vibrate([60, 30, 60]);
+
+            const avatarDiv = document.getElementById('customer-avatar');
+            avatarDiv.innerText = wrongReactions[Math.floor(Math.random() * wrongReactions.length)];
+            avatarDiv.classList.remove('succ-elastic', 'fail-drop');
+            void avatarDiv.offsetWidth;
+            avatarDiv.classList.add('fail-drop');
+
+            const flash = document.getElementById('damage-flash');
+            flash.style.opacity = '1';
+            setTimeout(() => flash.style.opacity = '0', 150);
+
+            const stage = document.getElementById('stage-area');
+            stage.classList.add('bg-red-50');
+            setTimeout(() => stage.classList.remove('bg-red-50'), 150);
+
+            updateUI();
+
+            if (timeLeft <= 0) {
+                clearInterval(gameInterval);
+                endGame();
+                return;
+            }
+
+            setTimeout(() => {
+                if(timeLeft > 0) nextCustomer();
+            }, 450);
+        }
+
+        function triggerFever() {
+            isFever = true;
+            document.getElementById('stage-area').classList.add('fever-mode');
+            document.getElementById('fever-notice').classList.remove('hidden');
+
+            feverTimeout = setTimeout(() => {
+                stopFever();
+            }, 5000);
+        }
+
+        function stopFever() {
+            isFever = false;
+            document.getElementById('stage-area').classList.remove('fever-mode');
+            document.getElementById('stage-area').classList.remove('fever-break');
+            document.getElementById('fever-notice').classList.add('hidden');
+        }
+
+        function stopFeverWithAnimation() {
+            clearTimeout(feverTimeout);
+            const stage = document.getElementById('stage-area');
+            stage.classList.remove('fever-mode');
+            stage.classList.add('fever-break');
+            document.getElementById('fever-notice').classList.add('hidden');
+            isFever = false;
+            handleWrong();
+        }
+
+        function updateUI() {
+            document.getElementById('score-display').innerText = `${score.toLocaleString()} Q`;
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            clearTimeout(feverTimeout);
+
+            // 실제 누적 포인트 계산 및 저장
+            const cash = Math.floor(score / 10);
+            const newTotal = getTotalCash() + cash;
+            localStorage.setItem(STORAGE_TOTAL_CASH, String(newTotal));
+            localStorage.setItem(STORAGE_LAST_SCORE, String(score));
+            localStorage.setItem(STORAGE_LAST_CASH, String(cash));
+
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-coin').innerText = `${score.toLocaleString()} Q`;
+            document.getElementById('final-cash').innerText = `${cash.toLocaleString()} 원`;
+            document.getElementById('total-accumulated-cash').innerText = `${newTotal.toLocaleString()} 원`;
+
+            const grade = getGradeInfo(score);
+            document.getElementById('final-badge').innerText = grade.badgeText;
+            document.getElementById('grade-title').innerText = grade.titleText;
+            document.getElementById('grade-comment').innerText = grade.commentText;
+            document.getElementById('level-bar').style.width = grade.levelPercent;
+            document.getElementById('level-percentage-text').innerText = grade.levelText;
+        }
+
+        function shareResultMobile() {
+            const lastScore = parseInt(localStorage.getItem(STORAGE_LAST_SCORE) || String(score), 10);
+            const gradeTitleEl = document.getElementById('grade-title');
+            const gradeTitle = gradeTitleEl && gradeTitleEl.innerText ? gradeTitleEl.innerText : '';
+            const textToCopy = `🥟 [매일 만두가게] 나 오늘 장사 엄청 잘 됨!\n- 내 오늘 매출: ${lastScore.toLocaleString()} Q\n- 내 장사 실력: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐!`;
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    alert("결과 텍스트가 복사되었어요! 친구 대화방에 붙여넣기 해보세요.");
+                }).catch(err => {
+                    fallbackCopyText(textToCopy);
+                });
+            } else {
+                fallbackCopyText(textToCopy);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                alert("기록 복사 완료! 친구에게 전달해 보세요.");
+            } catch (err) {
+                alert("복사를 완료하지 못했습니다.");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // 페이지 로드시 게이트 체크
+        initGate();
+    </script>
+</body>
+</html>
