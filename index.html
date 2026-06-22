@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <title>매일 여는 30초 만두 가게</title>
+    <title>매일 열리는 30초 만두 가게</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body {
@@ -72,7 +72,7 @@
                         매일 열리는<br><span class="text-amber-600">30초 만두 가게</span>
                     </h1>
                     <p class="text-base text-slate-500 font-medium leading-relaxed">
-                        하루에 딱 한 번만 참여할 수 있어요.<br>빠르게 서빙하고 포인트를 적립해 보세요.
+                        하루에 딱 한 번만 참여할 수 있어요.<br>오늘도 만두 빚고 포인트 받아가세요!
                     </p>
                 </div>
                 
@@ -228,7 +228,7 @@
             내 기록 친구한테 자랑하기 🚀
         </button>
         <button onclick="closeApp()" class="w-full bg-white hover:bg-slate-200 text-slate-700 font-semibold py-4 rounded-2xl text-base transition border border-slate-200">
-            닫기
+            내일 다시 만나요 👋
         </button>
     </div>
 </div>
@@ -591,11 +591,11 @@ function startGame() {
             const lastScore = parseInt(localStorage.getItem(STORAGE_LAST_SCORE) || String(score), 10);
             const gradeTitleEl = document.getElementById('grade-title');
             const gradeTitle = gradeTitleEl && gradeTitleEl.innerText ? gradeTitleEl.innerText : '';
-            const textToCopy = `🥟 [매일 만두가게] 나 오늘 장사 엄청 잘 됨!\n- 내 오늘 매출: ${lastScore.toLocaleString()} Q\n- 내 장사 실력: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐!`;
+            const textToCopy = `🥟 [매일 열리는 만두가게] 오늘도 만두 빚고 포인트 받자!\n- 나의 오늘 매출: ${lastScore.toLocaleString()} Q\n- 나의 장사 레벨: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐!\nhttps://nahyeon-3.github.io/sbi/`;
             
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
-                    alert("결과 텍스트가 복사되었어요! 친구 대화방에 붙여넣기 해보세요.");
+                    alert("결과가 복사되었어요! 친구 대화방에 붙여넣기 해보세요.");
                 }).catch(err => {
                     fallbackCopyText(textToCopy);
                 });
