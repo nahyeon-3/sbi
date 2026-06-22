@@ -388,7 +388,7 @@ function startGame() {
     commitAttendance();
     score = 0;
     gameEnded = false;
-    timeLeft = TOTAL_TIME; // 30초
+    timeLeft = TOTAL_TIME;
     nextCustomer();
     // 100ms(0.1초) 주기로 부드럽게 감소
     gameInterval = setInterval(() => {
@@ -571,19 +571,28 @@ function startGame() {
             clearInterval(gameInterval);
             clearTimeout(feverTimeout);
 
-            // 실제 누적 포인트 계산 및 저장
-            const cash = Math.floor(score / 10);
+            // 현재 게임 점수를 고정 (이후 어떤 이벤트가 와도 변하지 않도록)
+            const finalScore = score;
+            const cash = Math.floor(finalScore / 10);
             const newTotal = getTotalCash() + cash;
+
+            // localStorage 저장
             localStorage.setItem(STORAGE_TOTAL_CASH, String(newTotal));
-            localStorage.setItem(STORAGE_LAST_SCORE, String(score));
+            localStorage.setItem(STORAGE_LAST_SCORE, String(finalScore));
             localStorage.setItem(STORAGE_LAST_CASH, String(cash));
 
+            // end-screen 표시
             document.getElementById('end-screen').classList.remove('hidden');
-            document.getElementById('final-coin').innerText = `${score.toLocaleString()} Q`;
+            document.getElementById('final-coin').innerText = `${finalScore.toLocaleString()} Q`;
             document.getElementById('final-cash').innerText = `${cash.toLocaleString()} 원`;
             document.getElementById('total-accumulated-cash').innerText = `${newTotal.toLocaleString()} 원`;
 
-            const grade = getGradeInfo(score);
+            // already-played-screen도 현재 점수로 미리 업데이트 (새로고침 시 대비)
+            document.getElementById('already-played-score').innerText = `${finalScore.toLocaleString()} Q`;
+            document.getElementById('already-played-cash').innerText = `${cash.toLocaleString()} 원`;
+            document.getElementById('already-played-total').innerText = `${newTotal.toLocaleString()} 원`;
+
+            const grade = getGradeInfo(finalScore);
             document.getElementById('final-badge').innerText = grade.badgeText;
             document.getElementById('grade-title').innerText = grade.titleText;
             document.getElementById('grade-comment').innerText = grade.commentText;
