@@ -167,19 +167,19 @@
 
         <div class="p-6 bg-[#FFFAF0] space-y-4 shadow-[0_-10px_30px_rgba(180,150,100,0.05)]">
             <div class="grid grid-cols-4 gap-3">
-                <button onclick="pressMenu('🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="pressMenu('🥟')" onclick="pressMenu('🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🥟</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">고기</span>
                 </button>
-                <button onclick="pressMenu('🔥🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="pressMenu('🔥🥟')" onclick="pressMenu('🔥🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🌶️</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">김치</span>
                 </button>
-                <button onclick="pressMenu('🥤')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="pressMenu('🥤')" onclick="pressMenu('🥤')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🥤</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">식혜</span>
                 </button>
-                <button onclick="pressMenu('🍵')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="pressMenu('🍵')" onclick="pressMenu('🍵')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🍵</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">수정과</span>
                 </button>
@@ -447,7 +447,12 @@ function startGame() {
             });
         }
 
+        let lastPressTime = 0;
         function pressMenu(menu) {
+            const now = Date.now();
+            if (now - lastPressTime < 80) return; // 중복 실행 방지
+            lastPressTime = now;
+
             if (timeLeft <= 0) return;
             if (navigator.vibrate) navigator.vibrate(20);
 
