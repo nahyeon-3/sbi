@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <title>매일 열리는 30초 만두 가게</title>
+    <title>매일 여는 30초 만두 가게</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body {
@@ -72,7 +72,7 @@
                         매일 열리는<br><span class="text-amber-600">30초 만두 가게</span>
                     </h1>
                     <p class="text-base text-slate-500 font-medium leading-relaxed">
-                        하루에 딱 한 번만 참여할 수 있어요.<br>오늘도 만두 빚고 포인트 받아가세요!
+                        하루에 딱 한 번만 참여할 수 있어요.<br>빠르게 서빙하고 포인트를 적립해 보세요.
                     </p>
                 </div>
                 
@@ -167,27 +167,27 @@
 
         <div class="p-6 bg-[#FFFAF0] space-y-4 shadow-[0_-10px_30px_rgba(180,150,100,0.05)]">
             <div class="grid grid-cols-4 gap-3">
-                <button ontouchstart="pressMenu('🥟')" onclick="pressMenu('🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="event.preventDefault(); pressMenu('🥟')" onclick="pressMenu('🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🥟</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">고기</span>
                 </button>
-                <button ontouchstart="pressMenu('🔥🥟')" onclick="pressMenu('🔥🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="event.preventDefault(); pressMenu('🔥🥟')" onclick="pressMenu('🔥🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🌶️</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">김치</span>
                 </button>
-                <button ontouchstart="pressMenu('🥤')" onclick="pressMenu('🥤')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="event.preventDefault(); pressMenu('🥤')" onclick="pressMenu('🥤')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🥤</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">식혜</span>
                 </button>
-                <button ontouchstart="pressMenu('🍵')" onclick="pressMenu('🍵')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button ontouchstart="event.preventDefault(); pressMenu('🍵')" onclick="pressMenu('🍵')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🍵</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">수정과</span>
                 </button>
             </div>
         </div>
 
-<div id="end-screen" class="hidden absolute inset-0 bg-[#FFFAF0] z-50 flex flex-col justify-between p-6 overflow-y-auto">
-    <div>
+<div id="end-screen" class="hidden absolute inset-0 bg-[#FFFAF0] z-50 flex flex-col p-6">
+    <div class="flex-1 overflow-y-auto">
     <div class="mb-5">
         <span id="final-badge" class="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded-md">오늘 보상 정산</span>
         <h2 class="text-xl font-bold text-slate-900 mt-2">오늘 장사 정말 고생하셨어요!</h2>
@@ -223,12 +223,12 @@
     </div>
     </div>
 
-    <div class="space-y-3 pb-2">
+    <div class="space-y-3 pt-4 pb-2 shrink-0">
         <button onclick="shareResultMobile()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-4 rounded-2xl text-base transition active:scale-[0.98] shadow-md">
             내 기록 친구한테 자랑하기 🚀
         </button>
         <button onclick="closeApp()" class="w-full bg-white hover:bg-slate-200 text-slate-700 font-semibold py-4 rounded-2xl text-base transition border border-slate-200">
-            내일 다시 만나요 👋
+            닫기
         </button>
     </div>
 </div>
@@ -447,11 +447,7 @@ function startGame() {
             });
         }
 
-        let lastPressTime = 0;
         function pressMenu(menu) {
-            const now = Date.now();
-            if (now - lastPressTime < 80) return; // 중복 실행 방지
-            lastPressTime = now;
 
             if (timeLeft <= 0) return;
             if (navigator.vibrate) navigator.vibrate(20);
@@ -595,11 +591,11 @@ function startGame() {
             const lastScore = parseInt(localStorage.getItem(STORAGE_LAST_SCORE) || String(score), 10);
             const gradeTitleEl = document.getElementById('grade-title');
             const gradeTitle = gradeTitleEl && gradeTitleEl.innerText ? gradeTitleEl.innerText : '';
-            const textToCopy = `🥟 [매일 열리는 만두가게] 오늘도 만두 빚고 포인트 받자!\n- 나의 오늘 매출: ${lastScore.toLocaleString()} Q\n- 나의 장사 레벨: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐!\nhttps://nahyeon-3.github.io/sbi/`;
+            const textToCopy = `🥟 [매일 만두가게] 나 오늘 장사 엄청 잘 됨!\n- 내 오늘 매출: ${lastScore.toLocaleString()} Q\n- 내 장사 실력: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐!`;
             
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
-                    alert("결과가 복사되었어요! 친구 대화방에 붙여넣기 해보세요.");
+                    alert("결과 텍스트가 복사되었어요! 친구 대화방에 붙여넣기 해보세요.");
                 }).catch(err => {
                     fallbackCopyText(textToCopy);
                 });
