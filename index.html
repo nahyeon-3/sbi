@@ -167,19 +167,19 @@
 
         <div class="p-6 bg-[#FFFAF0] space-y-4 shadow-[0_-10px_30px_rgba(180,150,100,0.05)]">
             <div class="grid grid-cols-4 gap-3">
-                <button ontouchstart="event.preventDefault(); pressMenu('🥟')" onclick="pressMenu('🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button data-menu="🥟" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🥟</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">고기</span>
                 </button>
-                <button ontouchstart="event.preventDefault(); pressMenu('🔥🥟')" onclick="pressMenu('🔥🥟')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button data-menu="🔥🥟" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🌶️</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">김치</span>
                 </button>
-                <button ontouchstart="event.preventDefault(); pressMenu('🥤')" onclick="pressMenu('🥤')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button data-menu="🥤" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🥤</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">식혜</span>
                 </button>
-                <button ontouchstart="event.preventDefault(); pressMenu('🍵')" onclick="pressMenu('🍵')" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
+                <button data-menu="🍵" class="bg-white hover:bg-amber-50 active:scale-90 rounded-2xl py-4 flex flex-col items-center transition-all duration-100 border border-amber-100">
                     <span class="text-3xl">🍵</span>
                     <span class="text-xs font-semibold mt-2 text-slate-700">수정과</span>
                 </button>
@@ -628,6 +628,23 @@ function startGame() {
 
         // 페이지 로드시 게이트 체크
         initGate();
+
+        // 메뉴 버튼 이벤트 등록 - touchstart로 즉시 반응, click은 비터치 환경 fallback
+        document.querySelectorAll('[data-menu]').forEach(function(btn) {
+            var menu = btn.dataset.menu;
+            var touched = false;
+
+            btn.addEventListener('touchstart', function(e) {
+                e.preventDefault(); // 이후 click 이벤트 완전 차단
+                touched = true;
+                pressMenu(menu);
+            }, { passive: false });
+
+            btn.addEventListener('click', function(e) {
+                if (touched) { touched = false; return; } // 터치 후 발생한 click 무시
+                pressMenu(menu);
+            });
+        });
 
         // 핀치줌 / 제스처 확대 완전 차단 (touch-action: manipulation이 더블탭줌도 처리)
         document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
