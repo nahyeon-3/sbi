@@ -590,7 +590,7 @@ function startGame() {
             const lastScore = parseInt(localStorage.getItem(STORAGE_LAST_SCORE) || String(score), 10);
             const gradeTitleEl = document.getElementById('grade-title');
             const gradeTitle = gradeTitleEl && gradeTitleEl.innerText ? gradeTitleEl.innerText : '';
-            const textToCopy = `🥟 [매일 열리는 만두가게] 오늘도 만두 빚고 포인트 받자!\n- 내 오늘 매출: ${lastScore.toLocaleString()} Q\n- 내 장사 레벨: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐! https://nahyeon-3.github.io/sbi/`;
+            const textToCopy = `🥟 [매일 열리는 만두가게] 오늘도 만두 빚고 포인트 받자!\n- 나의 오늘 매출: ${lastScore.toLocaleString()} Q\n- 나의 장사 레벨: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐!\nhttps://nahyeon-3.github.io/sbi/`;
             
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
