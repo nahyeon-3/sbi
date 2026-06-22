@@ -228,7 +228,7 @@
             내 기록 친구한테 자랑하기 🚀
         </button>
         <button onclick="closeApp()" class="w-full bg-white hover:bg-slate-200 text-slate-700 font-semibold py-4 rounded-2xl text-base transition border border-slate-200">
-            닫기
+            내일 다시 만나요 👋
         </button>
     </div>
 </div>
@@ -628,19 +628,12 @@ function startGame() {
         // 페이지 로드시 게이트 체크
         initGate();
 
-        // 핀치줌 / 더블탭 확대 완전 차단
+        // 핀치줌 / 제스처 확대 완전 차단 (touch-action: manipulation이 더블탭줌도 처리)
         document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
         document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
         document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
         document.addEventListener('touchmove', function(e) {
             if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
-
-        let lastTap = 0;
-        document.addEventListener('touchend', function(e) {
-            const now = Date.now();
-            if (now - lastTap < 300) e.preventDefault();
-            lastTap = now;
         }, { passive: false });
     </script>
 </body>
