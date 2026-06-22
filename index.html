@@ -387,6 +387,7 @@ function startGame() {
     document.getElementById('start-screen').classList.add('hidden');
     commitAttendance();
     score = 0;
+    gameEnded = false;
     timeLeft = TOTAL_TIME; // 30초
     nextCustomer();
     // 100ms(0.1초) 주기로 부드럽게 감소
@@ -563,7 +564,10 @@ function startGame() {
             document.getElementById('score-display').innerText = `${score.toLocaleString()} Q`;
         }
 
+        let gameEnded = false;
         function endGame() {
+            if (gameEnded) return;
+            gameEnded = true;
             clearInterval(gameInterval);
             clearTimeout(feverTimeout);
 
