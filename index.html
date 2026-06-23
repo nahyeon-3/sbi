@@ -604,7 +604,7 @@ function startGame() {
         function shareResultMobile() {
             const lastScore = parseInt(localStorage.getItem(STORAGE_LAST_SCORE) || String(score), 10);
 const gradeTitle = localStorage.getItem('mandu_last_grade') || getGradeInfo(lastScore).titleText;
-            const textToCopy = `🥟 [매일 열리는 만두가게] 오늘도 만두 빚고 포인트 받자!\n- 나의 오늘 매출: ${lastScore.toLocaleString()} Q\n- 나의 장사 레벨: ${gradeTitle}\n🔥 나보다 손 빨라? 링크 누르고 매장 운영권 뺏어봐!\nhttps://nahyeon-3.github.io/sbi/`;
+            const textToCopy = `🥟매일 열리는 만두가게🥟 오늘도 만두 빚고 포인트 받자!\n- 오늘 매출: ${lastScore.toLocaleString()} Q\n- 나의 장사 레벨: ${gradeTitle}\n🔥 내 기록보다 높은 사람 손! 지금 바로 대결하기!\nhttps://nahyeon-3.github.io/sbi/`;
             
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
