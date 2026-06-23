@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <title>매일 열리는 30초 만두가게</title>
+    <title>매일 열리는 30초 만두 가게</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body {
@@ -348,7 +348,7 @@
                 };
             } else {
                 return {
-                    badgeText: "🚨 만두 긴급 점검",
+                    badgeText: "🚨 서비스 긴급 점검",
                     titleText: "Lv.1 만두피 빚기 담당",
                     commentText: "오늘 주방 상황이 영 좋지 않네요... 손님들이 화나서 다 나가버렸어요! 다시 앞치마 꽉 매고 만두 빚기 연습부터 시작하시죠!",
                     levelPercent: "10%",
@@ -450,7 +450,7 @@ function startGame() {
 
         function pressMenu(menu) {
 
-            if (timeLeft <= 0 || gameEnded) return;
+            if (timeLeft <= 0) return;
             if (navigator.vibrate) navigator.vibrate(20);
 
             if (isFever) {
@@ -529,7 +529,7 @@ function startGame() {
             }
 
             setTimeout(() => {
-                if(timeLeft > 0 && !gameEnded) nextCustomer();
+                if(timeLeft > 0) nextCustomer();
             }, 450);
         }
 
@@ -580,7 +580,6 @@ function startGame() {
             localStorage.setItem(STORAGE_TOTAL_CASH, String(newTotal));
             localStorage.setItem(STORAGE_LAST_SCORE, String(finalScore));
             localStorage.setItem(STORAGE_LAST_CASH, String(cash));
-            localStorage.setItem('mandu_last_grade', grade.titleText);
 
             // end-screen 표시
             document.getElementById('end-screen').classList.remove('hidden');
@@ -603,7 +602,8 @@ function startGame() {
 
         function shareResultMobile() {
             const lastScore = parseInt(localStorage.getItem(STORAGE_LAST_SCORE) || String(score), 10);
-const gradeTitle = localStorage.getItem('mandu_last_grade') || getGradeInfo(lastScore).titleText;
+            const gradeTitleEl = document.getElementById('grade-title');
+            const gradeTitle = gradeTitleEl && gradeTitleEl.innerText ? gradeTitleEl.innerText : '';
             const textToCopy = `🥟매일 열리는 만두가게🥟 오늘도 만두 빚고 포인트 받자!\n- 오늘 매출: ${lastScore.toLocaleString()} Q\n- 나의 장사 레벨: ${gradeTitle}\n🔥 내 기록보다 높은 사람 손! 지금 바로 대결하기!\nhttps://nahyeon-3.github.io/sbi/`;
             
             if (navigator.clipboard && window.isSecureContext) {
