@@ -450,7 +450,7 @@ function startGame() {
 
         function pressMenu(menu) {
 
-            if (timeLeft <= 0) return;
+            if (timeLeft <= 0 || gameEnded) return;
             if (navigator.vibrate) navigator.vibrate(20);
 
             if (isFever) {
@@ -529,7 +529,7 @@ function startGame() {
             }
 
             setTimeout(() => {
-                if(timeLeft > 0) nextCustomer();
+                if(timeLeft > 0 && !gameEnded) nextCustomer();
             }, 450);
         }
 
