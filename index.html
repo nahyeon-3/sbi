@@ -225,7 +225,7 @@
 
     <div class="space-y-3 pt-4 pb-2 shrink-0">
         <button onclick="shareResultMobile()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-4 rounded-2xl text-base transition active:scale-[0.98] shadow-md">
-            내 기록 친구한테 자랑하기 🚀
+            내 기록 자랑하기 🚀
         </button>
         <button onclick="closeApp()" class="w-full bg-white hover:bg-slate-200 text-slate-700 font-semibold py-4 rounded-2xl text-base transition border border-slate-200">
             내일 다시 만나요 👋
@@ -608,7 +608,7 @@ function startGame() {
             
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
-                    alert("오늘의 기록 복사 완료! 친구에게 내 점수를 자랑하러 가볼까요?🥟");
+                    alert("오늘 기록 복사 완료! 이제 마음껏 자랑하러 가볼까요?🥟");
                 }).catch(err => {
                     fallbackCopyText(textToCopy);
                 });
