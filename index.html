@@ -608,7 +608,7 @@ function startGame() {
             
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
-                    alert("결과가 복사되었어요! 친구 대화방에 붙여넣기 해보세요.");
+                    alert("오늘의 기록 복사 완료! 친구에게 내 점수를 자랑하러 가볼까요?🥟");
                 }).catch(err => {
                     fallbackCopyText(textToCopy);
                 });
